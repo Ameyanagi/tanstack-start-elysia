@@ -75,7 +75,11 @@ After scaffolding completes:
 
 9. Create `frontend/vitest.config.ts` and `frontend/src/__tests__/smoke.test.ts` from stack-details.md section "Frontend Test Configuration".
 
-10. Merge these scripts into `frontend/package.json` (preserve existing scripts from scaffolding):
+10. Update `frontend/tsconfig.json`:
+    - Add `"@repo/backend/*": ["../backend/*"]` to `compilerOptions.paths` (needed for Eden Treaty type imports)
+    - Remove `eslint.config.js` and `prettier.config.js` from the `include` array if present
+
+11. Merge these scripts into `frontend/package.json` (preserve existing scripts from scaffolding):
     ```json
     {
       "scripts": {
@@ -144,7 +148,14 @@ After scaffolding completes:
 
 13. Write `backend/scripts/validate-openapi.ts` from stack-details.md section "OpenAPI Validation Script".
 
-14. Write `backend/tests/health.test.ts` from stack-details.md section "Backend Tests".
+14. Create `backend/.gitignore` from stack-details.md section "Backend Gitignore".
+
+15. Write `backend/tests/health.test.ts` from stack-details.md section "Backend Tests".
+
+16. Auto-fix the backend code to conform to Biome rules (formatting, imports):
+    ```bash
+    cd backend && bunx biome check --write --unsafe .
+    ```
 
 ## Step 5: Generate Better Auth Schema & Initial Migration
 

@@ -10,7 +10,6 @@ All configuration file contents for the init-tanstack-elysia skill.
 
 ```json
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "vcs": {
     "enabled": true,
@@ -78,7 +77,6 @@ All configuration file contents for the init-tanstack-elysia skill.
 
 ```json
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "vcs": {
     "enabled": true,
@@ -179,6 +177,7 @@ After creating this file, run `bun install` to link the workspaces.
   "devDependencies": {
     "@biomejs/biome": "latest",
     "@types/pg": "latest",
+    "bun-types": "latest",
     "drizzle-kit": "latest",
     "typescript": "latest"
   }
@@ -389,17 +388,20 @@ import type { App } from '@repo/backend/src/app'
 export const api = treaty<App>(import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3001')
 ```
 
-Note: This import relies on Bun workspaces resolving `@repo/backend`. The `type` import ensures no runtime backend code is bundled into the frontend. If TypeScript cannot resolve the path, add a path alias in the frontend's tsconfig.json:
+Note: This import relies on TypeScript path resolution. You **must** add a path alias in the frontend's `tsconfig.json` to resolve the backend types:
 
 ```json
 {
   "compilerOptions": {
     "paths": {
+      "@/*": ["./src/*"],
       "@repo/backend/*": ["../backend/*"]
     }
   }
 }
 ```
+
+Merge this into the existing `paths` object in `tsconfig.json` (preserve the existing `@/*` alias from shadcn). Also clean up stale references: remove `eslint.config.js` and `prettier.config.js` from the `include` array if present.
 
 ---
 
@@ -927,6 +929,19 @@ DB_NAME=devdb
 
 # Better Auth
 BETTER_AUTH_SECRET=change-me-in-production
+```
+
+---
+
+## Backend Gitignore
+
+`backend/.gitignore` (needed for Biome's VCS integration to find ignore rules):
+
+```gitignore
+node_modules/
+dist/
+drizzle/
+openapi.json
 ```
 
 ---

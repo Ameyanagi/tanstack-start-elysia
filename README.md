@@ -18,7 +18,7 @@ npx skills add Ameyanagi/tanstack-start-elysia -a claude-code
 
 ## Usage
 
-Navigate to an empty directory where you want the project created, then invoke the skill:
+Navigate to an empty directory where you want the project created, then invoke the skill in Claude Code (or any compatible AI agent):
 
 ```
 /init-tanstack-elysia
@@ -29,14 +29,14 @@ The agent scaffolds the project **in your current working directory**. When fini
 - **Frontend**: TanStack Start + shadcn/ui (Mira style, Indigo theme) + Biome + tsc
 - **Backend**: ElysiaJS + Better Auth (username + password) + Drizzle ORM (PostgreSQL)
 - **API Client**: Eden Treaty for end-to-end type safety (no codegen)
-- **Task Runner**: justfile with `dev`, `check`, `fix`, `test`, `gen-api` commands
+- **Task Runner**: justfile with `dev`, `check`, `fix`, `test`, `gen-api`, `db-push`, `db-studio` commands
 - **Production**: Docker multi-stage builds + docker-compose
 
 ## How It Works
 
 The skill performs these steps automatically:
 
-1. **Version Control** — initializes [Jujutsu](https://jj-vcs.github.io/jj/) colocated with Git
+1. **Version Control** — initializes [Jujutsu](https://jj-vcs.github.io/jj/) alongside Git (colocated mode — both VCS tools work in the same directory)
 2. **Frontend** — scaffolds TanStack Start via `shadcn create`, replaces ESLint/Prettier with Biome, adds Eden Treaty client and Better Auth client SDK
 3. **Backend** — creates an ElysiaJS app with Better Auth (username + password), Drizzle ORM, Swagger docs, and CORS
 4. **Database** — starts PostgreSQL via Docker, generates Better Auth schema, pushes to database via Drizzle Kit
@@ -46,17 +46,26 @@ The skill performs these steps automatically:
 
 ## Prerequisites
 
-The skill checks for these tools and stops if any required tool is missing.
-
-**Required:**
+**Required to run the skill:**
 
 - [Bun](https://bun.sh) >= 1.2 — JavaScript runtime and package manager
 - [just](https://github.com/casey/just) >= 1.0 — task runner
-- [jj](https://jj-vcs.github.io/jj/) >= 0.25 — version control (colocated with Git)
+- [jj](https://jj-vcs.github.io/jj/) >= 0.25 — version control
 
-**Required for local development (PostgreSQL):**
+The skill checks for these and stops if any are missing.
 
-- [Docker](https://www.docker.com/) >= 24.0 — runs PostgreSQL in a container for local development and production builds. The skill warns if Docker is missing but continues scaffolding; however, `just dev` and database operations require it.
+**Required to use the generated project:**
+
+- [Docker](https://www.docker.com/) >= 24.0 — runs PostgreSQL for local development and production builds. The skill warns if Docker is missing but continues scaffolding. You'll need Docker before running `just dev` or any database operations.
+
+Verify your setup:
+
+```bash
+bun --version      # >= 1.2
+just --version     # >= 1.0
+jj --version       # >= 0.25
+docker --version   # >= 24.0 (optional for scaffolding)
+```
 
 ## Generated Project Structure
 
@@ -98,6 +107,7 @@ The skill checks for these tools and stops if any required tool is missing.
 │   │   └── validate-openapi.ts
 │   ├── tests/
 │   │   └── health.test.ts
+│   ├── drizzle/              # Generated migrations
 │   ├── drizzle.config.ts
 │   ├── biome.json
 │   ├── tsconfig.json
@@ -124,13 +134,20 @@ The skill checks for these tools and stops if any required tool is missing.
 
 After the skill completes:
 
-1. Review `.env` and update `BETTER_AUTH_SECRET` with a strong random value
-2. Run `just dev` to start PostgreSQL, frontend, and backend
+1. Edit `.env` and replace the placeholder `BETTER_AUTH_SECRET` with a strong random value
+2. Start the dev environment (requires Docker):
+   ```bash
+   just dev
+   ```
+   This starts PostgreSQL, the frontend dev server, and the backend API.
 3. Access the app:
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3001
    - Swagger docs: http://localhost:3001/docs
-4. Run `just db-studio` to browse the database
+4. Browse the database:
+   ```bash
+   just db-studio
+   ```
 
 ## Tooling Overview
 
